@@ -6,8 +6,11 @@ using UnityEngine.Events;
 public class EventManager : MonoBehaviour
 {
     public static EventManager Instance;
-    public UnityEvent onVictoryCheck = new UnityEvent();
-    public UnityEvent onVictory = new UnityEvent();
+    public class IntEvent : UnityEvent<int> { }
+
+    public IntEvent onVictoryCheck = new IntEvent();
+    public IntEvent onVictory = new IntEvent();
+    public UnityEvent onNextLevel = new UnityEvent();
 
     private void Awake()
     {

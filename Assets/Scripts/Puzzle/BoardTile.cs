@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -32,6 +33,12 @@ public class BoardTile : MonoBehaviour
     public Vector3 SlotPosition()
     {
         return visual.position;
+    }
+
+    public void Shake()
+    {
+        transform.DOShakePosition(0.2f, 0.25f, 90);
+        transform.DOShakeScale(0.2f, 0.25f, 90);
     }
 
     public void Activate()

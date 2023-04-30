@@ -7,7 +7,7 @@ using Array2DEditor;
 public class PawnController : MonoBehaviour
 {
     [SerializeField] LayerMask tileMask, finishLineMask;
-    [SerializeField] Array2DBool oui;
+    [SerializeField] Line startRow;
     Vector2Int currentCoordinate;
     bool firstMove = true;
     Board board;
@@ -17,11 +17,39 @@ public class PawnController : MonoBehaviour
         board = FindObjectOfType<Board>();
     }
 
-    void MoveTo(BoardTile tile)
+    public void Initialize(Line line)
+    {
+        startRow = line;
+    }
+
+    void RotateTowards(Vector3 position)
+    {
+        Vector3 newRot = new Vector3();
+        if (transform.position.x > position.x)
+            newRot = new Vector3(0, -90, 0);
+        else if (transform.position.x < position.x)
+            newRot = new Vector3(0, 90, 0);
+
+        if (transform.position.z > position.z)
+            newRot = new Vector3(0, -180, 0);
+        else if (transform.position.z < position.z)
+            newRot = new Vector3(0, 0, 0);
+
+        float duration = 0.1f;
+        transform.DORotate(newRot, duration);
+    }
+
+    public void Activate(BoardTile tile)
     {
         tile.Activate();
-        transform.DOMove(tile.SlotPosition(), 0.25f);
         currentCoordinate = tile.Coordinates;
+        MoveTo(tile.SlotPosition());
+    }
+
+    public void MoveTo(Vector3 newPos)
+    {
+        RotateTowards(newPos);
+        transform.DOMove(newPos, 0.25f);
     }
 
     void Update()
@@ -59,16 +87,20 @@ public class PawnController : MonoBehaviour
         {
             if (firstMove)
             {
-                if (board.LastRow(tile.Coordinates))
+                if (board.LastRow(tile.Coordinates) && startRow.Row.GetCell(tile.Coordinates.x, 0))
                 {
-                    MoveTo(tile);
+                    Activate(tile);
                     firstMove = false;
                 }
+                else
+                    tile.Shake();
             }
             else
             {
                 if (board.Adjacent(currentCoordinate, tile.Coordinates))
-                    MoveTo(tile);
+                    Activate(tile);
+                else
+                    tile.Shake();
             }
         }
     }

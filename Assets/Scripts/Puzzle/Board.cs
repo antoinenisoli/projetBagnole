@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Array2DEditor;
 
 public class Board : MonoBehaviour
@@ -22,22 +23,34 @@ public class Board : MonoBehaviour
     private void Start()
     {
         EventManager.Instance.onVictoryCheck.AddListener(CheckVictory);
+        EventManager.Instance.onNextLevel.AddListener(LoadNextLevel);
     }
 
 #if UNITY_EDITOR
-    private void OnDrawGizmosSelected()
+    private void OnDrawGizmos()
     {
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(firstCellPosition, 0.5f);
+        Gizmos.color = Color.yellow;
+        for (int i = 0; i < array.GridSize.x; i++)
+        {
+            for (int j = 0; j < array.GridSize.y; j++)
+            {
+                int value = array.GetCell(i, j);
+                if (value == 1)
+                {
+                    Vector3 spawnPos = firstCellPosition + (new Vector3(i, 0, j) * cellSize) + new Vector3(0.5f, 0, -0.5f);
+                    Gizmos.DrawWireCube(spawnPos, Vector3.one);
+                }
+            }
+        }
     }
 #endif
 
-    public void CheckVictory()
+    public void CheckVictory(int index)
     {
         if (AllCellsActivated())
         {
             print("victory");
-            EventManager.Instance.onVictory.Invoke();
+            EventManager.Instance.onVictory.Invoke(index);
         }
     }
 
@@ -127,5 +140,24 @@ public class Board : MonoBehaviour
     public void ActivateTile(BoardTile tile)
     {
         pawn.transform.position = tile.SlotPosition();
+    }
+
+    public void Reload() //called by button
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void LoadNextLevel() 
+    {
+        if (SceneManager.GetActiveScene().buildIndex + 1 >= SceneManager.sceneCount)
+            Reload();
+        else
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.R))
+            Reload();
     }
 }
