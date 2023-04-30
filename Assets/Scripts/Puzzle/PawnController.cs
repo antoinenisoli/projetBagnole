@@ -44,6 +44,7 @@ public class PawnController : MonoBehaviour
         tile.Activate();
         currentCoordinate = tile.Coordinates;
         MoveTo(tile.SlotPosition());
+        EventManager.Instance.onNewMove.Invoke(currentCoordinate);
     }
 
     public void MoveTo(Vector3 newPos)
@@ -73,12 +74,15 @@ public class PawnController : MonoBehaviour
         {
             FinishLine finishLine = hit.transform.GetComponentInParent<FinishLine>();
             if (finishLine)
-            {
-                Vector2Int lineCoordinates = new Vector2Int(currentCoordinate.x, board.BoardSize().y);
-                if (board.Adjacent(currentCoordinate, lineCoordinates))
-                    finishLine.CheckVictory(lineCoordinates);
-            }
+                SelectFinishLine(finishLine);
         }
+    }
+
+    private void SelectFinishLine(FinishLine finishLine)
+    {
+        Vector2Int lineCoordinates = new Vector2Int(currentCoordinate.x, board.BoardSize().y);
+        if (board.TargetTileIsNeighbour(currentCoordinate, lineCoordinates))
+            finishLine.CheckVictory(lineCoordinates);
     }
 
     private void SelectTile(BoardTile tile)
@@ -97,7 +101,7 @@ public class PawnController : MonoBehaviour
             }
             else
             {
-                if (board.Adjacent(currentCoordinate, tile.Coordinates))
+                if (board.TargetTileIsNeighbour(currentCoordinate, tile.Coordinates))
                     Activate(tile);
                 else
                     tile.Shake();

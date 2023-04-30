@@ -10,12 +10,7 @@ public class FinishLine : Line
     public override void Start()
     {
         base.Start();
-        EventManager.Instance.onVictory.AddListener(
-            (int index) => 
-            { 
-                StartCoroutine(Victory(index)); 
-            } 
-            );
+        EventManager.Instance.onVictory.AddListener(Victory);
     }
 
     public void CheckVictory(Vector2Int coord)
@@ -24,10 +19,8 @@ public class FinishLine : Line
             EventManager.Instance.onVictoryCheck.Invoke(coord.x);
     }
 
-    IEnumerator Victory(int index)
+    void Victory(int index)
     {
         FindObjectOfType<PawnController>().MoveTo(slots[index].position);
-        yield return new WaitForSeconds(2f);
-        EventManager.Instance.onNextLevel.Invoke();
     }
 }

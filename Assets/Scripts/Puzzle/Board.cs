@@ -6,11 +6,12 @@ using Array2DEditor;
 
 public class Board : MonoBehaviour
 {
-    [SerializeField] PawnController pawn;
+    [SerializeField] GameObject[] helpers;
 
     [Header("GRID CREATION")]
     [SerializeField] Vector3 firstCellPosition = new Vector3(-3, 0, 2);
     [SerializeField] GameObject tilePrefab;
+    [SerializeField] Transform container;
     [SerializeField] int cellSize;
     [SerializeField] Array2DInt array;
     BoardTile[,] tiles;
@@ -23,7 +24,7 @@ public class Board : MonoBehaviour
     private void Start()
     {
         EventManager.Instance.onVictoryCheck.AddListener(CheckVictory);
-        EventManager.Instance.onNextLevel.AddListener(LoadNextLevel);
+        EventManager.Instance.onNewMove.AddListener(NewMove);
     }
 
 #if UNITY_EDITOR
@@ -70,7 +71,7 @@ public class Board : MonoBehaviour
                 if (value == 1)
                 {
                     Vector3 spawnPos = firstCellPosition + (new Vector3(i, 0, j) * cellSize);
-                    GameObject newTile = Instantiate(tilePrefab, spawnPos, Quaternion.identity, transform);
+                    GameObject newTile = Instantiate(tilePrefab, spawnPos, Quaternion.identity, container);
                     Vector2Int coordinate = new Vector2Int(i, j);
                     newTile.name = tilePrefab.name + coordinate;
 
@@ -93,32 +94,62 @@ public class Board : MonoBehaviour
         return true;
     }
 
-    public bool Adjacent(Vector2Int baseCoord, Vector2Int targetCoord)
+    public bool TargetTileIsNeighbour(Vector2Int baseCoord, Vector2Int targetCoord)
     {
         for (int x = -1; x < 2; x++) //check horizontal line
         {
             Vector2Int offset = new Vector2Int(x, 0);
-            if (Check(offset, baseCoord, targetCoord))
+            if (IsNeighbour(offset, baseCoord, targetCoord))
                 return true;
         }
 
         for (int y = -1; y < 2; y++) //check vertical line
         {
             Vector2Int offset = new Vector2Int(0, y);
-            if (Check(offset, baseCoord, targetCoord))
+            if (IsNeighbour(offset, baseCoord, targetCoord))
                 return true;
         }
 
         return false;
     }
 
-    bool Check(Vector2Int offset, Vector2Int baseCoord, Vector2Int targetCoord)
+    bool IsNeighbour(Vector2Int offset, Vector2Int baseCoord, Vector2Int targetCoord)
     {
         Vector2Int checkCoordinate = baseCoord + offset;
         if (checkCoordinate == targetCoord)
             return true;
 
         return false;
+    }
+
+    bool HasNeighbours(Vector2Int coordinate)
+    {
+        List<BoardTile> neighbours = new List<BoardTile>();
+        for (int x = -1; x < 2; x++) //check horizontal line
+        {
+            Vector2Int offset = new Vector2Int(x, 0);
+            Vector2Int newCoord = coordinate + offset;
+            if (CoordinateIsValid(newCoord) && x != 0)
+            {
+                BoardTile tile = tiles[newCoord.x, newCoord.y];
+                if (tile && !tile.Activated)
+                    neighbours.Add(tile);
+            }
+        }
+
+        for (int y = -1; y < 2; y++) //check vertical line
+        {
+            Vector2Int offset = new Vector2Int(0, y);
+            Vector2Int newCoord = coordinate + offset;
+            if (CoordinateIsValid(newCoord) && y != 0)
+            {
+                BoardTile tile = tiles[newCoord.x, newCoord.y];
+                if (tile && !tile.Activated)
+                    neighbours.Add(tile);
+            }
+        }
+
+        return neighbours.Count > 0;
     }
 
     public bool LastRow(Vector2Int coord)
@@ -137,27 +168,53 @@ public class Board : MonoBehaviour
         return true;
     }
 
-    public void ActivateTile(BoardTile tile)
+    void NewMove(Vector2Int coordinate)
     {
-        pawn.transform.position = tile.SlotPosition();
-    }
+        foreach (var item in helpers)
+            item.SetActive(false);
 
-    public void Reload() //called by button
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-    }
-
-    public void LoadNextLevel() 
-    {
-        if (SceneManager.GetActiveScene().buildIndex + 1 >= SceneManager.sceneCount)
-            Reload();
+        if (HasNeighbours(coordinate))
+            PlaceHelpers(coordinate);
         else
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        {
+            print("defeat");
+            EventManager.Instance.onGameOver.Invoke();
+        }
     }
 
-    private void Update()
+    public void PlaceHelpers(Vector2Int coordinate)
     {
-        if (Input.GetKeyDown(KeyCode.R))
-            Reload();
+        Queue<GameObject> helperQueue = new Queue<GameObject>(helpers);
+        for (int x = -1; x < 2; x++) //check horizontal line
+        {
+            Vector2Int offset = new Vector2Int(x, 0);
+            Vector2Int newCoord = coordinate + offset;
+            if (CoordinateIsValid(newCoord) && x != 0)
+            {
+                BoardTile tile = tiles[newCoord.x, newCoord.y];
+                if (tile && !tile.Activated)
+                {
+                    GameObject helper = helperQueue.Dequeue();
+                    helper.SetActive(true);
+                    helper.transform.position = tile.SlotPosition();
+                }
+            }
+        }
+
+        for (int y = -1; y < 2; y++) //check vertical line
+        {
+            Vector2Int offset = new Vector2Int(0, y);
+            Vector2Int newCoord = coordinate + offset;
+            if (CoordinateIsValid(newCoord) && y != 0)
+            {
+                BoardTile tile = tiles[newCoord.x, newCoord.y];
+                if (tile && !tile.Activated)
+                {
+                    GameObject helper = helperQueue.Dequeue();
+                    helper.SetActive(true);
+                    helper.transform.position = tile.SlotPosition();
+                }
+            }
+        }
     }
 }
