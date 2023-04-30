@@ -5,10 +5,23 @@ using UnityEngine;
 public class BoardTile : MonoBehaviour
 {
     public bool Activated;
+    private Vector2Int coordinates;
     [SerializeField] Transform visual;
     [SerializeField] Material activeMaterial, unactiveMaterial;
     MeshRenderer meshRenderer;
     Board board;
+
+    public Vector2Int Coordinates { get => coordinates; set => coordinates = value; }
+
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+        GUIStyle style = new GUIStyle();
+        style.normal.textColor = Color.black;
+        style.fontSize = 20;
+        UnityEditor.Handles.Label(transform.position, $"{coordinates.x},{coordinates.y}", style);
+    }
+#endif
 
     private void Awake()
     {
@@ -21,13 +34,12 @@ public class BoardTile : MonoBehaviour
         return visual.position;
     }
 
-    private void OnMouseDown()
+    public void Activate()
     {
         if (Activated)
             return;
 
         Activated = true;
         meshRenderer.material = Activated ? activeMaterial : unactiveMaterial;
-        board.ActivateTile(this);
     }
 }
