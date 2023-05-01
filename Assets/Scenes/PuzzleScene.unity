@@ -365,7 +365,7 @@ RectTransform:
   - {fileID: 373155227}
   - {fileID: 1453622899}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -425,7 +425,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 6.14
+  orthographic size: 6
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -449,7 +449,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 668629820}
   m_LocalRotation: {x: 0.39674166, y: -0, z: -0, w: 0.9179303}
-  m_LocalPosition: {x: 0, y: 5.5, z: -6}
+  m_LocalPosition: {x: 0, y: 5.5, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -545,7 +545,7 @@ GameObject:
   m_Component:
   - component: {fileID: 957940871}
   - component: {fileID: 957940872}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Start
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -579,7 +579,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tilePrefab: {fileID: 8329596930540691701, guid: 72887f2ef7f40804e835339ab3106308, type: 3}
-  lineLength: 3
   spacing: 2
   row:
     gridSize: {x: 3, y: 1}
@@ -619,7 +618,7 @@ Transform:
   - {fileID: 957940871}
   - {fileID: 1237191399}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1155671100
 PrefabInstance:
@@ -713,7 +712,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1237191399}
   - component: {fileID: 1237191400}
-  - component: {fileID: 1237191401}
   m_Layer: 6
   m_Name: Finish
   m_TagString: Untagged
@@ -729,7 +727,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1237191398}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 3}
+  m_LocalPosition: {x: 0, y: 0, z: 7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 967707660}
@@ -748,26 +746,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tilePrefab: {fileID: 8329596930540691701, guid: 72887f2ef7f40804e835339ab3106308, type: 3}
-  lineLength: 3
   spacing: 2
   row:
     gridSize: {x: 3, y: 1}
     cellSize: {x: 16, y: 16}
     cells:
     - row: 010101
---- !u!65 &1237191401
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1237191398}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 6, y: 1, z: 2}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1409902940 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: ecac047fc314e2d4f9d2ae854bb95163, type: 3}
@@ -987,7 +971,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1791745364 stripped
 GameObject:
@@ -1045,16 +1029,20 @@ MonoBehaviour:
   - {fileID: 1577049971}
   - {fileID: 1518623635}
   firstCellPosition: {x: -3, y: 0, z: -2}
-  tilePrefab: {fileID: 6672950718638956200, guid: 0cb28857d1ce40e4e95ed2da75a0de3f, type: 3}
   container: {fileID: 1444449805}
   cellSize: 2
   array:
-    gridSize: {x: 3, y: 3}
+    gridSize: {x: 3, y: 5}
     cellSize: {x: 32, y: 16}
     cells:
+    - row: 010000000100000002000000
+    - row: 010000000100000001000000
+    - row: 010000000200000001000000
     - row: 010000000100000001000000
     - row: 010000000100000001000000
-    - row: 010000000100000001000000
+  tilePrefabs:
+  - {fileID: 6672950718638956200, guid: 0cb28857d1ce40e4e95ed2da75a0de3f, type: 3}
+  - {fileID: 95931162260259417, guid: 9677938393027b14f92ec91c490f0f79, type: 3}
 --- !u!1 &1887035382
 GameObject:
   m_ObjectHideFlags: 0

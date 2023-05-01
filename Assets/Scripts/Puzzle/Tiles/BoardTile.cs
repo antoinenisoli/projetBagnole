@@ -10,7 +10,6 @@ public class BoardTile : MonoBehaviour
     [SerializeField] Transform visual;
     [SerializeField] Material activeMaterial, unactiveMaterial;
     MeshRenderer meshRenderer;
-    Board board;
 
     public Vector2Int Coordinates { get => coordinates; set => coordinates = value; }
 
@@ -26,7 +25,6 @@ public class BoardTile : MonoBehaviour
 
     private void Awake()
     {
-        board = FindObjectOfType<Board>();
         meshRenderer = GetComponentInChildren<MeshRenderer>();
     }
 
@@ -41,7 +39,7 @@ public class BoardTile : MonoBehaviour
         transform.DOShakeScale(0.2f, 0.25f, 90);
     }
 
-    public void Activate()
+    public virtual void Activate()
     {
         if (Activated)
             return;

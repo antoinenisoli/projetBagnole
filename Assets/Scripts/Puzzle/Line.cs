@@ -6,7 +6,7 @@ using UnityEngine;
 public class Line : MonoBehaviour
 {
     [SerializeField] protected GameObject tilePrefab;
-    [SerializeField] protected int lineLength = 3, spacing = 2;
+    [SerializeField] protected int spacing = 2;
     [SerializeField] protected Array2DBool row;
     protected BoxCollider col;
     protected List<Transform> slots = new List<Transform>();
@@ -18,7 +18,7 @@ public class Line : MonoBehaviour
     private void OnDrawGizmos()
     {
         Vector3 pos = transform.position + new Vector3(-spacing, 0, 0);
-        for (int i = 0; i < lineLength; i++)
+        for (int i = 0; i < row.GridSize.x; i++)
         {
             Color gizmoColor = row.GetCell(i, 0) ? Color.green : Color.red;
             Gizmos.color = gizmoColor;
@@ -39,27 +39,18 @@ public class Line : MonoBehaviour
 
     public virtual void Start()
     {
-        if (col)
-            ScaleCollider();
+        
     }
 
     private void BuildLine()
     {
         Vector3 pos = new Vector3(-spacing, 0, 0);
-        for (int i = 0; i < lineLength; i++)
+        for (int i = 0; i < row.GridSize.x; i++)
         {
             GameObject o = Instantiate(tilePrefab, transform);
             slots.Add(o.transform);
             o.transform.localPosition = pos;
             pos.x += spacing;
         }
-    }
-
-    private void ScaleCollider()
-    {
-        Vector3 oldSize = col.size;
-        float length = lineLength * spacing;
-        oldSize.x = length;
-        col.size = oldSize;
     }
 }

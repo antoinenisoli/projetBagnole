@@ -11,10 +11,12 @@ public class PawnController : MonoBehaviour
     Vector2Int currentCoordinate;
     bool firstMove = true;
     Board board;
+    Camera cam;
 
     private void Awake()
     {
         board = FindObjectOfType<Board>();
+        cam = Camera.main;
     }
 
     public void Initialize(Line line)
@@ -49,6 +51,7 @@ public class PawnController : MonoBehaviour
 
     public void MoveTo(Vector3 newPos)
     {
+        transform.DOKill();
         RotateTowards(newPos);
         transform.DOMove(newPos, 0.25f);
     }
@@ -61,7 +64,7 @@ public class PawnController : MonoBehaviour
 
     void OnClick()
     {
-        var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        var ray = cam.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
         if (Physics.Raycast(ray, out hit, Mathf.Infinity, tileMask) && hit.transform != null)

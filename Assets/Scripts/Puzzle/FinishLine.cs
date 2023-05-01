@@ -15,8 +15,13 @@ public class FinishLine : Line
 
     public void CheckVictory(Vector2Int coord)
     {
-        if (row.GetCell(coord.x, 0))
+        if (CanReach(coord))
             EventManager.Instance.onVictoryCheck.Invoke(coord.x);
+    }
+
+    public bool CanReach(Vector2Int coord)
+    {
+        return row.GetCell(coord.x, 0);
     }
 
     void Victory(int index)
