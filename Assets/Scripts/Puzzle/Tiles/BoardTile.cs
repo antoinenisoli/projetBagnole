@@ -45,7 +45,6 @@ public class BoardTile : MonoBehaviour
         Sequence sequence = DOTween.Sequence();
         sequence.AppendInterval(0.05f);
         sequence.Append(transform.DOMoveY(-0.35f, floatingDuration/3));
-        //sequence.Append(transform.DOMoveY(0, floatingDuration / 2));
         sequence.Append(transform.DOMoveY(0.1f, floatingDuration / 3));
         sequence.Append(transform.DOMoveY(0, floatingDuration / 3));
     }

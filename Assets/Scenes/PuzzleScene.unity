@@ -1362,7 +1362,7 @@ Camera:
   m_GameObject: {fileID: 668629820}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 2
+  m_ClearFlags: 1
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
@@ -3874,7 +3874,7 @@ MonoBehaviour:
   - {fileID: 1835260209}
   - {fileID: 676800354}
   - {fileID: 2003997759}
-  firstCellPosition: {x: -3, y: 0, z: -2}
+  firstCellPosition: {x: -3, y: 0, z: 6}
   container: {fileID: 1444449805}
   cellSize: 2
   tilePrefabs:
@@ -3884,11 +3884,26 @@ MonoBehaviour:
     gridSize: {x: 3, y: 5}
     cellSize: {x: 32, y: 16}
     cells:
-    - row: 010000000100000002000000
-    - row: 010000000100000001000000
-    - row: 010000000200000001000000
-    - row: 010000000100000001000000
-    - row: 010000000100000001000000
+    - row:
+      - 1
+      - 1
+      - 1
+    - row:
+      - 0
+      - 0
+      - 0
+    - row:
+      - 0
+      - 0
+      - 0
+    - row:
+      - 1
+      - 1
+      - 0,0
+    - row:
+      - 1
+      - 1
+      - 1
 --- !u!1 &1887035382
 GameObject:
   m_ObjectHideFlags: 0

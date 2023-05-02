@@ -13,10 +13,33 @@ public class Board : MonoBehaviour
     [SerializeField] Transform container;
     [SerializeField] int cellSize;
     [SerializeField] GameObject[] tilePrefabs;
-    [SerializeField] Array2DInt array;
+    [SerializeField] Array2DString array;
     BoardTile[,] tiles;
 
     public BoardTile[,] Tiles { get => tiles; }
+
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+        for (int x = 0; x < array.GridSize.x; x++)
+        {
+            for (int y = array.GridSize.y - 1; y >= 0; y--)
+            {
+                string coordText = array.GetCell(x, y);
+                if (string.IsNullOrEmpty(coordText) || (float.Parse(coordText) == 0 && coordText.Length == 1))
+                    continue;
+
+                if (coordText.Length == 1)
+                    Gizmos.color = Color.yellow;
+                else // is a portal
+                    Gizmos.color = Color.green;
+
+                Vector3 spawnPos = firstCellPosition + (new Vector3(x, 0, -y) * cellSize) + new Vector3(0.5f, 0, -0.5f);
+                Gizmos.DrawWireCube(spawnPos, Vector3.one);
+            }
+        }
+    }
+#endif
 
     private void Awake()
     {
@@ -29,28 +52,14 @@ public class Board : MonoBehaviour
         EventManager.Instance.onNewMove.AddListener(NewMove);
     }
 
-#if UNITY_EDITOR
-    private void OnDrawGizmos()
+    public BoardTile GetTile(Vector2Int coordinate)
     {
-        for (int i = 0; i < array.GridSize.x; i++)
-        {
-            for (int j = 0; j < array.GridSize.y; j++)
-            {
-                int value = array.GetCell(i, j);
-                if (value == 0)
-                    return;
+        foreach (var item in tiles)
+            if (item && item.Coordinates == coordinate)
+                return item;
 
-                if (value == 1)
-                    Gizmos.color = Color.yellow;
-                else if (value == 2)
-                    Gizmos.color = Color.green;
-
-                Vector3 spawnPos = firstCellPosition + (new Vector3(i, 0, j) * cellSize) + new Vector3(0.5f, 0, -0.5f);
-                Gizmos.DrawWireCube(spawnPos, Vector3.one);
-            }
-        }
+        return null;
     }
-#endif
 
     public void CheckVictory(int index)
     {
@@ -69,25 +78,42 @@ public class Board : MonoBehaviour
     void CreateGrid()
     {
         tiles = new BoardTile[array.GridSize.x, array.GridSize.y];
-        for (int i = 0; i < array.GridSize.x; i++)
-        {
-            for (int j = 0; j < array.GridSize.y; j++)
-            {
-                int value = array.GetCell(i, j);
-                if (value != 0)
-                {
-                    Vector3 spawnPos = firstCellPosition + (new Vector3(i, 0, j) * cellSize);
-                    GameObject prefab = tilePrefabs[value - 1];
-                    GameObject newTile = Instantiate(prefab, spawnPos, Quaternion.identity, container);
-                    Vector2Int coordinate = new Vector2Int(i, j);
-                    newTile.name = prefab.name + coordinate;
+        Dictionary<Vector2Int, PortalTile> portals = new Dictionary<Vector2Int, PortalTile>();
 
-                    BoardTile boardTile = newTile.GetComponent<BoardTile>();
-                    boardTile.Coordinates = coordinate;
-                    tiles[i, j] = boardTile;
+        for (int x = 0; x < array.GridSize.x; x++)
+        {
+            for (int y = array.GridSize.y - 1; y >= 0; y--)
+            {
+                string coordText = array.GetCell(x, y);
+                if (string.IsNullOrEmpty(coordText) || (float.Parse(coordText) == 0 && coordText.Length == 1))
+                    continue;
+
+                GameObject prefab = null;
+                if (coordText.Length == 1)
+                    prefab = tilePrefabs[0];
+                else // is a portal
+                    prefab = tilePrefabs[1];
+
+                Vector3 spawnPos = firstCellPosition + (new Vector3(x, 0, -y) * cellSize);
+                GameObject newTile = Instantiate(prefab, spawnPos, Quaternion.identity, container);
+                Vector2Int coordinate = new Vector2Int(x, y);
+                newTile.name = prefab.name + coordinate;
+
+                BoardTile boardTile = newTile.GetComponent<BoardTile>();
+                boardTile.Coordinates = coordinate;
+                tiles[x, y] = boardTile;
+
+                if (coordText.Length > 1)
+                {
+                    PortalTile portal = boardTile as PortalTile;
+                    Vector2Int transcodedCoordinate = new Vector2Int(int.Parse(coordText[0].ToString()), int.Parse(coordText[2].ToString()));
+                    portals.Add(transcodedCoordinate, portal);
                 }
             }
         }
+
+        foreach (var item in portals)
+            item.Value.SetTarget(GetTile(item.Key));
     }
 
     public bool CoordinateIsValid(Vector2Int coordinate)
@@ -162,13 +188,13 @@ public class Board : MonoBehaviour
 
     public bool LastRow(Vector2Int coord)
     {
-        return coord.y == 0;
+        return coord.y == BoardSize().y - 1;
     }
 
     public bool AllCellsActivated()
     {
         foreach (var item in tiles)
-            if (!item.Activated)
+            if (item && !item.Activated)
                 return false;
 
         return true;
@@ -176,7 +202,7 @@ public class Board : MonoBehaviour
 
     bool OnFinishLine(Vector2Int coordinate)
     {
-        return (coordinate.y == tiles.GetLength(1) - 1)
+        return (coordinate.y == 0)
             && AllCellsActivated()
             && FindObjectOfType<FinishLine>().CanReach(coordinate);
     }
@@ -186,7 +212,8 @@ public class Board : MonoBehaviour
         foreach (var item in helpers)
             item.SetActive(false);
 
-        if (HasNeighbours(coordinate))
+        bool isPortal = GetTile(coordinate) && GetTile(coordinate) is PortalTile;
+        if (HasNeighbours(coordinate) || isPortal)
             PlaceHelpers(coordinate);
         else if (!OnFinishLine(coordinate))
         {

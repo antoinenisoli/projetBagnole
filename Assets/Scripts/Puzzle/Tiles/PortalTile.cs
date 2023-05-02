@@ -4,22 +4,26 @@ using UnityEngine;
 
 public class PortalTile : BoardTile
 {
-    PortalTile OtherPortal()
-    {
-        var v = FindObjectsOfType<PortalTile>();
-        foreach (var item in v)
-        {
-            if (item != this)
-                return item;
-        }
+    [SerializeField] float delayDuration = 2f;
+    BoardTile targetPortal;
 
-        return null;
+    public void SetTarget(BoardTile target)
+    {
+        targetPortal = target;
     }
 
     public override void Activate()
     {
         base.Activate();
-        print(OtherPortal());
-        FindObjectOfType<PawnController>().MoveTo(OtherPortal().SlotPosition());
+        StartCoroutine(Teleport());
+    }
+
+    IEnumerator Teleport()
+    {
+        EventManager.Instance.onGameFreeze.Invoke(true);
+        yield return new WaitForSeconds(delayDuration);
+        FindObjectOfType<PawnController>().Activate(targetPortal);
+        yield return new WaitForSeconds(0.5f);
+        EventManager.Instance.onGameFreeze.Invoke(false);
     }
 }

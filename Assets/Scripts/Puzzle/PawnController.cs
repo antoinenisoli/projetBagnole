@@ -9,7 +9,7 @@ public class PawnController : MonoBehaviour
     [SerializeField] LayerMask tileMask, finishLineMask;
     [SerializeField] Line startRow;
     Vector2Int currentCoordinate;
-    bool firstMove = true;
+    bool firstMove = true, isFreezed = false;
     Board board;
     Camera cam;
 
@@ -17,6 +17,16 @@ public class PawnController : MonoBehaviour
     {
         board = FindObjectOfType<Board>();
         cam = Camera.main;
+    }
+
+    private void Start()
+    {
+        EventManager.Instance.onGameFreeze.AddListener(Freeze);
+    }
+
+    void Freeze(bool value)
+    {
+        isFreezed = value;
     }
 
     public void Initialize(Line line)
@@ -60,6 +70,8 @@ public class PawnController : MonoBehaviour
 
     void Update()
     {
+        if (isFreezed)
+            return;
         if (Input.GetMouseButtonDown(0))
             OnClick();
     }
@@ -71,7 +83,7 @@ public class PawnController : MonoBehaviour
 
         if (Physics.Raycast(ray, out hit, Mathf.Infinity, tileMask) && hit.transform != null)
         {
-            BoardTile tile = hit.transform.GetComponentInParent<BoardTile>();
+            BoardTile tile = hit.transform.GetComponentInChildren<BoardTile>();
             if (tile)
                 SelectTile(tile);
         }
@@ -85,7 +97,7 @@ public class PawnController : MonoBehaviour
 
     private void SelectFinishLine(FinishLine finishLine)
     {
-        Vector2Int lineCoordinates = new Vector2Int(currentCoordinate.x, board.BoardSize().y);
+        Vector2Int lineCoordinates = new Vector2Int(currentCoordinate.x, 0);
         if (board.TargetTileIsNeighbour(currentCoordinate, lineCoordinates))
             finishLine.CheckVictory(lineCoordinates);
     }
