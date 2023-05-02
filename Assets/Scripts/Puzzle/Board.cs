@@ -12,8 +12,8 @@ public class Board : MonoBehaviour
     [SerializeField] Vector3 firstCellPosition = new Vector3(-3, 0, 2);
     [SerializeField] Transform container;
     [SerializeField] int cellSize;
-    [SerializeField] Array2DInt array;
     [SerializeField] GameObject[] tilePrefabs;
+    [SerializeField] Array2DInt array;
     BoardTile[,] tiles;
 
     public BoardTile[,] Tiles { get => tiles; }
@@ -32,17 +32,21 @@ public class Board : MonoBehaviour
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.yellow;
         for (int i = 0; i < array.GridSize.x; i++)
         {
             for (int j = 0; j < array.GridSize.y; j++)
             {
                 int value = array.GetCell(i, j);
+                if (value == 0)
+                    return;
+
                 if (value == 1)
-                {
-                    Vector3 spawnPos = firstCellPosition + (new Vector3(i, 0, j) * cellSize) + new Vector3(0.5f, 0, -0.5f);
-                    Gizmos.DrawWireCube(spawnPos, Vector3.one);
-                }
+                    Gizmos.color = Color.yellow;
+                else if (value == 2)
+                    Gizmos.color = Color.green;
+
+                Vector3 spawnPos = firstCellPosition + (new Vector3(i, 0, j) * cellSize) + new Vector3(0.5f, 0, -0.5f);
+                Gizmos.DrawWireCube(spawnPos, Vector3.one);
             }
         }
     }
