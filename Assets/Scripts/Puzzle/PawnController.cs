@@ -46,6 +46,8 @@ public class PawnController : MonoBehaviour
         tile.Activate();
         currentCoordinate = tile.Coordinates;
         MoveTo(tile.SlotPosition());
+        transform.parent = tile.transform;
+        tile.PushDown();
         EventManager.Instance.onNewMove.Invoke(currentCoordinate);
     }
 

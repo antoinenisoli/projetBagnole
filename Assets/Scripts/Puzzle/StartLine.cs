@@ -16,9 +16,8 @@ public class StartLine : Line
             startIndex = 0;
     }
 
-    public override void Start()
+    public void Start()
     {
-        base.Start();
         var pawnObj = Instantiate(playerPrefab, slots[startIndex].position, Quaternion.identity);
         var pawn = pawnObj.GetComponent<PawnController>();
         pawn.Initialize(this);

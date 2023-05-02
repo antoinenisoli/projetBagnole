@@ -5,12 +5,21 @@ using Array2DEditor;
 
 public class FinishLine : Line
 {
-    //[Header(nameof(FinishLine))]
+    [Header(nameof(FinishLine))]
+    [SerializeField] Vector3 buildingLocalPosition;
+    [SerializeField] GameObject[] buildingPrefabs;
 
-    public override void Start()
+    public void Start()
     {
-        base.Start();
         EventManager.Instance.onVictory.AddListener(Victory);
+    }
+
+    public override void CreateTile(int i)
+    {
+        base.CreateTile(i);
+        GameObject random = GameDevHelper.RandomObject<GameObject>(buildingPrefabs);
+        GameObject obstacle = Instantiate(random, slots[i]);
+        obstacle.transform.localPosition = buildingLocalPosition;
     }
 
     public void CheckVictory(Vector2Int coord)
