@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: LevelData
   m_EditorClassIdentifier: 
   sceneName: 
-  timerA: 0
-  timerB: 0
-  timerC: 0
+  timerA: 20
+  timerB: 10
+  timerC: 5
